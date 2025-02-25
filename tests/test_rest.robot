@@ -3,20 +3,25 @@ Library    RequestsLibrary
 Library    Collections
 Resource    ../resources/keywords.resource
 
-
 *** Variables ***
-${token}    0
-${id}    1942
+${token}
+${id}    
 ${baseUrl}    https://restful-booker.herokuapp.com
+${firstName}    John
 
 
 *** Test Cases ***
 Login
-    ${token}    Authenticate as Admin
+    ${code}    Authenticate as Admin
+    Set Suite Variable    ${token}    ${code} 
+    Log    ${token}       
+
 
 Get Bookings from Restful Booker
-    ${body}    Create Dictionary    firstname=John
-    ${response}    GET    ${baseUrl}?${body}
+    Log To Console    \n\tNilai Token adalah ${token}
+    ${url}    Set Variable    ${baseUrl}?firstname=${firstName}
+    Log    ${url}
+    ${response}    GET    ${url}    
     Status Should Be    200
     # Log    ${response.json()}
     # FOR  ${booking}  IN  @{response.json()}
@@ -41,7 +46,7 @@ Create a Booking at Restful Booker
     Dictionary Should Contain Value     ${response.json()}    Breakfast
 
 Delete Booking
-    ${token}    Authenticate as Admin
+    Log To Console    ${token}
     ${header}    Create Dictionary    Content-Type=application/json    Cookie=token=${token}
     ${response}    DELETE    url=${baseUrl}/booking/${id}    headers=${header}   
     Status Should Be    201    ${response}
