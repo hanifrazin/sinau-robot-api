@@ -11,25 +11,22 @@ ${baseUrl}    https://restful-booker.herokuapp.com
 
 *** Test Cases ***
 Login as Auth - CreateToken
+    [Documentation]    Mulai Login untuk Autentikasi
     ${body}    Create Dictionary    username=admin    password=password123
     ${response}    POST    url=${baseUrl}/auth    json=${body}
-    Log    ${response.json()}
     Set Suite Variable    ${token}    ${response.json()}[token]
 
 Get Bookings from Restful Booker as GetBookingIds
-    Log To Console    \n\tNilai Token adalah ${token}
+    [Documentation]    Hit API Get Bookings Based on Firstname is John    
     FOR    ${key}    ${value}    IN    &{names}
         ${url}    Set Variable    ${baseUrl}/booking?${key}=${value}
     END
-    Log To Console    ${url}
     ${response}    GET    ${url}    
     Status Should Be    200
-    Log    ${response}
     FOR    ${index}    ${booking}    IN ENUMERATE    @{response.json()}
         ${var}=    Evaluate    ${index} + 1 
         ${response}    GET    ${baseUrl}/booking/${booking}[bookingid]
         TRY
-            Log    ${response.json()}
             IF    ${var} == 5
                 Exit For Loop
             END
@@ -39,10 +36,10 @@ Get Bookings from Restful Booker as GetBookingIds
     END
 
 Create a Booking at Restful Booker
+    [Documentation]    Buat Data Booking melalui API
     ${booking_dates}    Create Dictionary    checkin=2022-12-31    checkout=2023-01-01
     ${body}    Create Dictionary    firstname=Hans    lastname=Gruber    totalprice=200    depositpaid=${False}    bookingdates=${booking_dates}
     ${response}    POST    url=${baseUrl}/booking    json=${body}
-    Log    ${response.json()}[bookingid]
     ${bookingId}    Set Variable    ${response.json()}[bookingid]
     Set Suite Variable    ${id}    ${bookingId}
     &{booking}    Set Variable    ${response.json()}[booking]
@@ -59,8 +56,8 @@ Create a Booking at Restful Booker
     Should Be Equal As Strings    ${booking_check}[checkout]    2023-01-01
 
 Get Specific Booking by ID as Get Booking
+    [Documentation]    Cek Booking ID yang telah dibuat
     ${url}    Set Variable    ${baseUrl}/booking/${id}
-    Log    ${url}
     ${response}    GET    ${url}
     &{booking}    Set Variable    ${response.json()}
     &{booking_check}    Set Variable        ${booking}[bookingdates]
@@ -78,6 +75,7 @@ Get Specific Booking by ID as Get Booking
 
 
 Update Booking
+    [Documentation]    Update Data Booking
     ${header}    Create Dictionary    Content-Type=application/json    Accept=application/json    Cookie=token=${token}
     ${booking_dates}    Create Dictionary    checkin=2024-12-01    checkout=2024-12-25
     ${body}    Create Dictionary    firstname=Hario    lastname=Wicaksono    totalprice=10000000    depositpaid=true    bookingdates=${booking_dates}
@@ -98,6 +96,7 @@ Update Booking
     
 
 Partial Update Booking
+    [Documentation]    Update beberapa data booking
     ${header}    Create Dictionary    Content-Type=application/json    Accept=application/json    Cookie=token=${token}
     ${booking_dates}    Create Dictionary    checkin=2024-12-03    checkout=2024-12-10
     ${body}    Create Dictionary    lastname=Kalita    bookingdates=${booking_dates}
@@ -113,7 +112,7 @@ Partial Update Booking
     Should Be Equal As Strings    ${booking_check}[checkout]    ${booking_dates}[checkout] 
 
 Delete Booking
-    Log To Console    \n\t${token}
+    [Documentation]    Hapus Data Booking yang telah dibuat
     ${header}    Create Dictionary    Content-Type=application/json    Cookie=token=${token}
     ${response}    DELETE    url=${baseUrl}/booking/${id}    headers=${header}   
     Status Should Be    201    ${response}
