@@ -141,6 +141,11 @@ results/
 reports/
 report/
 result/
+# allure-report
+output/allure
+log.html
+output.xml
+report.html
 
 # Spyder project settings
 .spyderproject
