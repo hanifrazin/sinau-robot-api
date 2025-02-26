@@ -2,3 +2,6 @@ robotframework
 robotframework-requests
 Faker
 requests
+robotframework-metrics==3.7.0
+robotframework-dashboard
+allure-robotframework

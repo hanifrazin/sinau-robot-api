@@ -12,10 +12,10 @@ ${baseUrl}    https://restful-booker.herokuapp.com
 
 *** Test Cases ***
 Login as Auth - CreateToken
-    ${code}    Authenticate as Admin
-    Set Suite Variable    ${token}    ${code} 
-    Log    ${token}       
-
+    ${body}    Create Dictionary    username=admin    password=password123
+    ${response}    POST    url=${baseUrl}/auth    json=${body}
+    Log    ${response.json()}
+    Set Suite Variable    ${token}    ${response.json()}[token]
 
 Get Bookings from Restful Booker as GetBookingIds
     Log To Console    \n\tNilai Token adalah ${token}
