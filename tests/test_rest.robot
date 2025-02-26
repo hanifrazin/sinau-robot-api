@@ -7,7 +7,7 @@ Resource    ../resources/keywords.resource
 ${token}    123abc123abc
 ${id}    1950
 ${baseUrl}    https://restful-booker.herokuapp.com
-${firstName}    John
+&{names}    firstname=John
 
 
 *** Test Cases ***
@@ -19,8 +19,10 @@ Login as Auth - CreateToken
 
 Get Bookings from Restful Booker as GetBookingIds
     Log To Console    \n\tNilai Token adalah ${token}
-    ${url}    Set Variable    ${baseUrl}/booking?firstname=${firstName}
-    Log    ${url}
+    FOR    ${key}    ${value}    IN    &{names}
+        ${url}    Set Variable    ${baseUrl}/booking?${key}=${value}
+    END
+    Log To Console    ${url}
     ${response}    GET    ${url}    
     Status Should Be    200
     Log    ${response}
@@ -39,61 +41,87 @@ Get Bookings from Restful Booker as GetBookingIds
 
 Create a Booking at Restful Booker
     ${booking_dates}    Create Dictionary    checkin=2022-12-31    checkout=2023-01-01
-    ${body}    Create Dictionary    firstname=Hans    lastname=Gruber    totalprice=200    depositpaid=false    bookingdates=${booking_dates}
+    ${body}    Create Dictionary    firstname=Hans    lastname=Gruber    totalprice=200    depositpaid=${False}    bookingdates=${booking_dates}
     ${response}    POST    url=${baseUrl}/booking    json=${body}
     Log    ${response.json()}[bookingid]
     ${bookingId}    Set Variable    ${response.json()}[bookingid]
     Set Suite Variable    ${id}    ${bookingId}
     &{booking}    Set Variable    ${response.json()}[booking]
-    Should Be Equal    ${booking}[lastname]   Gruber
-    Log    ${booking}[lastname]
-    Should Be Equal    ${booking}[firstname]   Hans
-    Log    ${booking}[firstname]   
-    Should Be Equal As Numbers    ${booking}[totalprice]    200
+    &{booking_check}    Set Variable    ${booking}[bookingdates]
+    Should Be Equal    ${booking}[lastname]   ${body}[lastname]
+    Should Be Equal    ${booking}[firstname]   ${body}[firstname]
+    Should Be Equal As Strings    ${booking}[lastname]   ${body}[lastname]
+    Should Be Equal As Strings    ${booking}[firstname]   ${body}[firstname]  
+    Should Be Equal As Numbers    ${booking}[totalprice]    ${body}[totalprice]
+    Should Be Equal   ${booking}[depositpaid]    ${False}
+    Should Be Equal    ${booking_check}[checkin]    2022-12-31
+    Should Be Equal    ${booking_check}[checkout]    2023-01-01
+    Should Be Equal As Strings    ${booking_check}[checkin]    2022-12-31
+    Should Be Equal As Strings    ${booking_check}[checkout]    2023-01-01
 
 Get Specific Booking by ID as Get Booking
-    Log To Console    \n\tNilai Token adalah ${token}
     ${url}    Set Variable    ${baseUrl}/booking/${id}
     Log    ${url}
-    ${response}    GET    ${url}    
+    ${response}    GET    ${url}
+    &{booking}    Set Variable    ${response.json()}
+    &{booking_check}    Set Variable        ${booking}[bookingdates]
     Status Should Be    200
-    Should Be Equal    ${response.json()}[lastname]   Gruber
-    Log    ${response.json()}[lastname]
-    Should Be Equal    ${response.json()}[firstname]   Hans
-    Log    ${response.json()}[firstname]   
-    Should Be Equal As Numbers    ${response.json()}[totalprice]    200
+    Should Be Equal    ${booking}[lastname]   Gruber
+    Should Be Equal    ${booking}[firstname]   Hans
+    Should Be Equal As Strings    ${booking}[lastname]   Gruber
+    Should Be Equal As Strings    ${booking}[firstname]   Hans  
+    Should Be Equal As Numbers    ${booking}[totalprice]    200
+    Should Be Equal   ${booking}[depositpaid]    ${False}
+    Should Be Equal    ${booking_check}[checkin]    2022-12-31
+    Should Be Equal    ${booking_check}[checkout]    2023-01-01
+    Should Be Equal As Strings    ${booking_check}[checkin]    2022-12-31
+    Should Be Equal As Strings    ${booking_check}[checkout]    2023-01-01
+
 
 Update Booking
-    Log To Console    \n\t${token}
     ${header}    Create Dictionary    Content-Type=application/json    Accept=application/json    Cookie=token=${token}
     ${booking_dates}    Create Dictionary    checkin=2024-12-01    checkout=2024-12-25
     ${body}    Create Dictionary    firstname=Hario    lastname=Wicaksono    totalprice=10000000    depositpaid=true    bookingdates=${booking_dates}
     ${response}    PUT    url=${baseUrl}/booking/${id}    headers=${header}    json=${body}
+    &{booking}    Set Variable    ${response.json()}
+    &{booking_check}    Set Variable        ${booking}[bookingdates]
     Status Should Be    200
-    Should Be Equal    ${response.json()}[lastname]   Wicaksono
-    Log    ${response.json()}[lastname]
-    Should Be Equal    ${response.json()}[firstname]   Hario
-    Log    ${response.json()}[firstname]   
-    Should Be Equal As Numbers    ${response.json()}[totalprice]    10000000
-    Should be True     ${response.json()}[depositpaid]    true
+    Should Be Equal    ${booking}[lastname]   ${body}[lastname]
+    Should Be Equal    ${booking}[firstname]   ${body}[firstname]
+    Should Be Equal As Strings    ${booking}[lastname]   ${body}[lastname]
+    Should Be Equal As Strings    ${booking}[firstname]   ${body}[firstname]  
+    Should Be Equal As Numbers    ${booking}[totalprice]    ${body}[totalprice]
+    Should Be Equal   ${booking}[depositpaid]    ${True}
+    Should Be Equal    ${booking_check}[checkin]    ${booking_dates}[checkin]
+    Should Be Equal    ${booking_check}[checkout]    ${booking_dates}[checkout]
+    Should Be Equal As Strings    ${booking_check}[checkin]    ${booking_dates}[checkin]
+    Should Be Equal As Strings    ${booking_check}[checkout]    ${booking_dates}[checkout]
     
 
 Partial Update Booking
-    Log To Console    \n\t${token}
     ${header}    Create Dictionary    Content-Type=application/json    Accept=application/json    Cookie=token=${token}
-    ${booking_dates}    Create Dictionary    checkin=2024-12-01    checkout=2024-12-25
-    ${body}    Create Dictionary    lastname=Kalita
+    ${booking_dates}    Create Dictionary    checkin=2024-12-03    checkout=2024-12-10
+    ${body}    Create Dictionary    lastname=Kalita    bookingdates=${booking_dates}
     ${response}    PATCH    url=${baseUrl}/booking/${id}    headers=${header}    json=${body}
     Status Should Be    200
-    Should Be Equal    ${response.json()}[lastname]   Kalita
-    Log    ${response.json()}[lastname]
-    Should Be Equal    ${response.json()}[firstname]   Hario
-    Log    ${response.json()}[firstname]   
-    Should Be Equal As Numbers    ${response.json()}[totalprice]    10000000
-    Should be True     ${response.json()}[depositpaid]    true 
+    ${booking}    Set Variable    ${response.json()}
+    ${booking_check}    Set Variable    ${booking}[bookingdates]
+    Should Be Equal    ${response.json()}[lastname]   ${body}[lastname]
+    Should Be Equal As Strings    ${booking}[lastname]   ${body}[lastname]
+    Should Be Equal    ${booking_check}[checkin]    ${booking_dates}[checkin]
+    Should Be Equal    ${booking_check}[checkout]    ${booking_dates}[checkout]
+    Should Be Equal As Strings    ${booking_check}[checkin]    ${booking_dates}[checkin]
+    Should Be Equal As Strings    ${booking_check}[checkout]    ${booking_dates}[checkout] 
 
 Delete Booking
     Log To Console    \n\t${token}
     ${header}    Create Dictionary    Content-Type=application/json    Cookie=token=${token}
     ${response}    DELETE    url=${baseUrl}/booking/${id}    headers=${header}   
     Status Should Be    201    ${response}
+
+
+Ping - HealthCheck
+    ${response}    GET    url=${baseUrl}/ping
+    Log To Console    ${response}
+    Status Should Be    201
+    
