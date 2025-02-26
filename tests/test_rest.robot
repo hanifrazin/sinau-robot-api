@@ -1,7 +1,6 @@
 *** Settings ***
 Library    RequestsLibrary
 Library    Collections
-Resource    ../resources/keywords.resource
 
 *** Variables ***
 ${token}    123abc123abc
