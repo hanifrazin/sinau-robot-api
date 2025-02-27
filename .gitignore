@@ -136,16 +136,16 @@ ENV/
 virtualenv/
 env.bak/
 venv.bak/
-results/
 .venv/
 reports/
 report/
-result/
+
 # allure-report
 output/allure
 log.html
 output.xml
 report.html
+results/allure
 
 # Spyder project settings
 .spyderproject

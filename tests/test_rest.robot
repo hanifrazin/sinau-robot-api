@@ -22,12 +22,17 @@ Get Bookings from Restful Booker as GetBookingIds
         ${url}    Set Variable    ${baseUrl}/booking?${key}=${value}
     END
     ${response}    GET    ${url}    
+    ${data}    Get Length    ${response.json()}
+    Log    JSON : ${response.json()}
+    Log    Headers : ${response.headers}
+    Log    Cookies : ${response.cookies}
     Status Should Be    200
     FOR    ${index}    ${booking}    IN ENUMERATE    @{response.json()}
         ${var}=    Evaluate    ${index} + 1 
         ${response}    GET    ${baseUrl}/booking/${booking}[bookingid]
         TRY
             IF    ${var} == 5
+                Log To Console    Jumlah data sebanyak ${data}
                 Exit For Loop
             END
         EXCEPT
@@ -40,10 +45,12 @@ Create a Booking at Restful Booker
     ${booking_dates}    Create Dictionary    checkin=2022-12-31    checkout=2023-01-01
     ${body}    Create Dictionary    firstname=Hans    lastname=Gruber    totalprice=200    depositpaid=${False}    bookingdates=${booking_dates}
     ${response}    POST    url=${baseUrl}/booking    json=${body}
+    Log    ${response.headers}
     ${bookingId}    Set Variable    ${response.json()}[bookingid]
     Set Suite Variable    ${id}    ${bookingId}
     &{booking}    Set Variable    ${response.json()}[booking]
     &{booking_check}    Set Variable    ${booking}[bookingdates]
+    Status Should Be    200
     Should Be Equal    ${booking}[lastname]   ${body}[lastname]
     Should Be Equal    ${booking}[firstname]   ${body}[firstname]
     Should Be Equal As Strings    ${booking}[lastname]   ${body}[lastname]
@@ -120,6 +127,5 @@ Delete Booking
 
 Ping - HealthCheck
     ${response}    GET    url=${baseUrl}/ping
-    Log To Console    ${response}
     Status Should Be    201
     
