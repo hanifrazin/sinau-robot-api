@@ -4,7 +4,7 @@ allure serve results/allure
 allure generate results/allure
 
 -- Generate Robotmetrics Report
-robotmetrics -I ./results/ -O -d output.xml -M result-robotmetrics.html -L log.html
+robotmetrics -I ./results/ -O output.xml -M result-robotmetrics.html -L log.html
 
 -- Generate RobotDashboard Report
 robotdashboard -o results/output.xml -d results/robotdashboard/result_robot_dashboard.db -n results/robotdashboard/result_robot_database.html

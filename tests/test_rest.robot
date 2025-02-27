@@ -33,7 +33,7 @@ Get Bookings from Restful Booker as GetBookingIds
         ${response}    GET    ${baseUrl}/booking/${booking}[bookingid]
         TRY
             IF    ${var} == 5
-                Log To Console    Jumlah data sebanyak ${data}
+                Log To Console    \n\tJumlah data sebanyak ${data}
                 Exit For Loop
             END
         EXCEPT
