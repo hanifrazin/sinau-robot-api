@@ -1,6 +1,7 @@
 *** Settings ***
 Library    RequestsLibrary
 Library    Collections
+Library    Screenshot
 
 *** Variables ***
 ${token}    123abc123abc
@@ -40,6 +41,7 @@ Get Bookings from Restful Booker as GetBookingIds
         END
     END
 
+
 Create a Booking at Restful Booker
     [Documentation]    Buat Data Booking melalui API
     ${booking_dates}    Create Dictionary    checkin=2022-12-31    checkout=2023-01-01
@@ -61,6 +63,7 @@ Create a Booking at Restful Booker
     Should Be Equal    ${booking_check}[checkout]    2023-01-01
     Should Be Equal As Strings    ${booking_check}[checkin]    2022-12-31
     Should Be Equal As Strings    ${booking_check}[checkout]    2023-01-01
+
 
 Get Specific Booking by ID as Get Booking
     [Documentation]    Cek Booking ID yang telah dibuat
@@ -118,6 +121,7 @@ Partial Update Booking
     Should Be Equal As Strings    ${booking_check}[checkin]    ${booking_dates}[checkin]
     Should Be Equal As Strings    ${booking_check}[checkout]    ${booking_dates}[checkout] 
 
+
 Delete Booking
     [Documentation]    Hapus Data Booking yang telah dibuat
     ${header}    Create Dictionary    Content-Type=application/json    Cookie=token=${token}
@@ -128,4 +132,3 @@ Delete Booking
 Ping - HealthCheck
     ${response}    GET    url=${baseUrl}/ping
     Status Should Be    201
-    
