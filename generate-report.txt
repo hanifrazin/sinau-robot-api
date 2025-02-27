@@ -1,5 +1,5 @@
 -- Run Robot Then Generate Report such as Robot Framework Metrics and Robot Framework Dashboard
-robot --listener allure_robotframework:results/allure --prerunmodifier allure_robotframework.testplan ./tests/test_rest.robot
+robot --outputdir=results --listener allure_robotframework:results/allure --prerunmodifier allure_robotframework.testplan ./tests/test_rest.robot
 allure serve results/allure
 allure generate results/allure
 robotmetrics -I ./results/ -O -d output.xml -M result-robotmetrics.html -L log.html
