@@ -2,6 +2,7 @@
 Library    RequestsLibrary
 Library    Collections
 Library    Screenshot
+Variables    ../data/data_faker.py
 
 *** Variables ***
 ${token}    123abc123abc
@@ -45,7 +46,7 @@ Get Bookings from Restful Booker as GetBookingIds
 Create a Booking at Restful Booker
     [Documentation]    Buat Data Booking melalui API
     ${booking_dates}    Create Dictionary    checkin=2022-12-31    checkout=2023-01-01
-    ${body}    Create Dictionary    firstname=Hans    lastname=Gruber    totalprice=200    depositpaid=${False}    bookingdates=${booking_dates}
+    ${body}    Create Dictionary    firstname=${firstName}    lastname=${lastName}    totalprice=200    depositpaid=${False}    bookingdates=${booking_dates}
     ${response}    POST    url=${baseUrl}/booking    json=${body}
     Log    ${response.headers}
     ${bookingId}    Set Variable    ${response.json()}[bookingid]
@@ -72,10 +73,10 @@ Get Specific Booking by ID as Get Booking
     &{booking}    Set Variable    ${response.json()}
     &{booking_check}    Set Variable        ${booking}[bookingdates]
     Status Should Be    200
-    Should Be Equal    ${booking}[lastname]   Gruber
-    Should Be Equal    ${booking}[firstname]   Hans
-    Should Be Equal As Strings    ${booking}[lastname]   Gruber
-    Should Be Equal As Strings    ${booking}[firstname]   Hans  
+    Should Be Equal    ${booking}[lastname]   ${lastName}
+    Should Be Equal    ${booking}[firstname]   ${firstName}
+    Should Be Equal As Strings    ${booking}[lastname]   ${lastName}
+    Should Be Equal As Strings    ${booking}[firstname]   ${firstName}  
     Should Be Equal As Numbers    ${booking}[totalprice]    200
     Should Be Equal   ${booking}[depositpaid]    ${False}
     Should Be Equal    ${booking_check}[checkin]    2022-12-31
@@ -88,7 +89,7 @@ Update Booking
     [Documentation]    Update Data Booking
     ${header}    Create Dictionary    Content-Type=application/json    Accept=application/json    Cookie=token=${token}
     ${booking_dates}    Create Dictionary    checkin=2024-12-01    checkout=2024-12-25
-    ${body}    Create Dictionary    firstname=Hario    lastname=Wicaksono    totalprice=10000000    depositpaid=true    bookingdates=${booking_dates}
+    ${body}    Create Dictionary    firstname=${editFirstName}    lastname=${editLastName}    totalprice=10000000    depositpaid=true    bookingdates=${booking_dates}
     ${response}    PUT    url=${baseUrl}/booking/${id}    headers=${header}    json=${body}
     &{booking}    Set Variable    ${response.json()}
     &{booking_check}    Set Variable        ${booking}[bookingdates]
